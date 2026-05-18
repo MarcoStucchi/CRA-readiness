@@ -1,0 +1,251 @@
+{
+  "id": "iot-gateway-001",
+  "name": "Industrial IoT gateway",
+  "category": "IoT",
+  "cra_class": "important",
+  "applicable_standards": ["IEC 62443-4-2", "EN 18031-1", "ETSI EN 303 645"],
+  "description": "A device that bridges OT/IT networks, collects sensor data, and relays it to cloud or on-premise systems.",
+
+  "component_templates": [
+    {
+      "id": "ct-001",
+      "name": "Cloud connectivity agent",
+      "type": "process",
+      "layer": "application",
+      "required": true,
+      "typical": true,
+      "security_properties": ["authentication", "encryption", "integrity"],
+      "threat_dragon_shape": "process",
+      "elicitation_questions": [
+        "Does the device connect to a cloud platform or remote server?",
+        "Which protocol does it use? (e.g. MQTT, AMQP, HTTPS, proprietary)",
+        "Is the connection authenticated? If so, how? (certificates, API key, username/password)",
+        "Is the connection encrypted? Which TLS version?"
+      ]
+    },
+    {
+      "id": "ct-002",
+      "name": "Firmware update agent",
+      "type": "process",
+      "layer": "firmware",
+      "required": true,
+      "typical": true,
+      "security_properties": ["integrity", "authentication", "rollback-protection"],
+      "threat_dragon_shape": "process",
+      "elicitation_questions": [
+        "Does the device support firmware updates?",
+        "How are updates delivered? (OTA, local USB, serial port, SD card)",
+        "Are firmware images signed and verified before installation?",
+        "Is there rollback protection if an update fails?"
+      ]
+    },
+    {
+      "id": "ct-003",
+      "name": "Local configuration interface",
+      "type": "process",
+      "layer": "application",
+      "required": false,
+      "typical": true,
+      "security_properties": ["authentication", "access-control"],
+      "threat_dragon_shape": "process",
+      "elicitation_questions": [
+        "Does the device have a local configuration interface? (web UI, CLI, mobile app)",
+        "Which protocol or access method does it use? (HTTP, HTTPS, SSH, UART)",
+        "Is authentication required to access it?",
+        "Are default credentials changeable by the user?"
+      ]
+    },
+    {
+      "id": "ct-004",
+      "name": "Sensor / field device interface",
+      "type": "external-entity",
+      "layer": "hardware",
+      "required": true,
+      "typical": true,
+      "security_properties": ["integrity", "availability"],
+      "threat_dragon_shape": "external-entity",
+      "elicitation_questions": [
+        "Which field protocols does the device support? (Modbus RTU/TCP, OPC-UA, PROFINET, CAN, 4-20mA, custom)",
+        "Is the field communication authenticated or encrypted in any way?",
+        "Can a rogue field device be injected without detection?"
+      ]
+    },
+    {
+      "id": "ct-005",
+      "name": "Persistent data store",
+      "type": "datastore",
+      "layer": "firmware",
+      "required": false,
+      "typical": true,
+      "security_properties": ["confidentiality", "integrity"],
+      "threat_dragon_shape": "datastore",
+      "elicitation_questions": [
+        "Does the device store data locally? (logs, buffered telemetry, configuration)",
+        "Is stored data encrypted at rest?",
+        "What happens to stored data if the device is physically removed or tampered with?"
+      ]
+    },
+    {
+      "id": "ct-006",
+      "name": "Debug / JTAG interface",
+      "type": "external-entity",
+      "layer": "hardware",
+      "required": false,
+      "typical": true,
+      "security_properties": ["access-control", "authentication"],
+      "threat_dragon_shape": "external-entity",
+      "elicitation_questions": [
+        "Does the device have a JTAG, UART debug, or similar hardware debug interface?",
+        "Is it disabled or protected in production units?",
+        "Is secure boot enabled to prevent unauthorised firmware loading?"
+      ]
+    },
+    {
+      "id": "ct-007",
+      "name": "Network management interface",
+      "type": "process",
+      "layer": "OS",
+      "required": false,
+      "typical": false,
+      "security_properties": ["authentication", "access-control", "encryption"],
+      "threat_dragon_shape": "process",
+      "elicitation_questions": [
+        "Does the device expose a network management interface? (SNMP, NETCONF, REST API)",
+        "Is it accessible from both OT and IT network sides?",
+        "Is it authenticated and encrypted?"
+      ]
+    }
+  ],
+
+  "connection_templates": [
+    {
+      "id": "cn-001",
+      "source_component_id": "ct-004",
+      "target_component_id": "ct-001",
+      "protocols": ["Modbus TCP", "OPC-UA"],
+      "direction": "unidirectional",
+      "crosses_trust_boundary": true,
+      "trust_boundary_name": "OT/IT boundary",
+      "typical": true,
+      "required": true,
+      "elicitation_questions": [
+        "Does data flow from field devices through the gateway to the cloud without transformation, or is it normalised?",
+        "Is there any filtering or validation of field data before forwarding?"
+      ]
+    },
+    {
+      "id": "cn-002",
+      "source_component_id": "ct-001",
+      "target_component_id": "ct-002",
+      "protocols": ["HTTPS", "MQTT"],
+      "direction": "unidirectional",
+      "crosses_trust_boundary": true,
+      "trust_boundary_name": "Cloud/device boundary",
+      "typical": true,
+      "required": false,
+      "elicitation_questions": [
+        "Are firmware update packages delivered over the same cloud channel as telemetry, or a separate channel?",
+        "Can the cloud platform initiate a firmware push without operator confirmation on the device?"
+      ]
+    },
+    {
+      "id": "cn-003",
+      "source_component_id": "ct-003",
+      "target_component_id": "ct-005",
+      "protocols": ["internal"],
+      "direction": "bidirectional",
+      "crosses_trust_boundary": false,
+      "trust_boundary_name": "",
+      "typical": true,
+      "required": false,
+      "elicitation_questions": [
+        "Can a local admin read or export stored telemetry data through the configuration interface?",
+        "Are configuration changes logged to the persistent store?"
+      ]
+    },
+    {
+      "id": "cn-004",
+      "source_component_id": "ct-006",
+      "target_component_id": "ct-002",
+      "protocols": ["JTAG", "UART"],
+      "direction": "bidirectional",
+      "crosses_trust_boundary": true,
+      "trust_boundary_name": "Physical access boundary",
+      "typical": true,
+      "required": false,
+      "elicitation_questions": [
+        "Can the debug interface be used to extract credentials or keys stored in the device?",
+        "Is the bootloader protected against modification via debug interface?"
+      ]
+    }
+  ],
+
+  "threat_hints": [
+    {
+      "id": "th-001",
+      "component_type": "process",
+      "connection_type": "MQTT",
+      "stride_category": "S",
+      "title": "Spoofed cloud endpoint",
+      "description": "An attacker impersonates the cloud broker, intercepting telemetry and injecting commands.",
+      "cra_clause": "Annex I Part I (2)(a)",
+      "mitigation": "Mutual TLS with pinned server certificate",
+      "severity": "high"
+    },
+    {
+      "id": "th-002",
+      "component_type": "process",
+      "connection_type": "firmware-update",
+      "stride_category": "T",
+      "title": "Unsigned firmware accepted",
+      "description": "A malicious firmware image is installed if signature verification is absent or bypassable.",
+      "cra_clause": "Annex I Part I (2)(c)",
+      "mitigation": "Hardware-rooted signature verification; reject unsigned images",
+      "severity": "high"
+    },
+    {
+      "id": "th-003",
+      "component_type": "external-entity",
+      "connection_type": "Modbus TCP",
+      "stride_category": "S",
+      "title": "Rogue Modbus master",
+      "description": "Modbus has no authentication; any device on the OT network can issue read/write commands.",
+      "cra_clause": "Annex I Part I (1)",
+      "mitigation": "Network segmentation; allowlist of permitted Modbus masters by MAC/IP",
+      "severity": "medium"
+    },
+    {
+      "id": "th-004",
+      "component_type": "external-entity",
+      "connection_type": "JTAG",
+      "stride_category": "E",
+      "title": "Privilege escalation via debug interface",
+      "description": "An attacker with physical access uses the JTAG interface to read memory, extract keys, or inject code.",
+      "cra_clause": "Annex I Part I (2)(f)",
+      "mitigation": "Disable JTAG in production fuses; enable secure boot",
+      "severity": "high"
+    },
+    {
+      "id": "th-005",
+      "component_type": "datastore",
+      "connection_type": "internal",
+      "stride_category": "I",
+      "title": "Tampered local logs",
+      "description": "An attacker with local access modifies or deletes stored logs to cover tracks or corrupt audit trail.",
+      "cra_clause": "Annex I Part I (2)(j)",
+      "mitigation": "Append-only log storage; log integrity via HMAC",
+      "severity": "medium"
+    },
+    {
+      "id": "th-006",
+      "component_type": "process",
+      "connection_type": "HTTP",
+      "stride_category": "S",
+      "title": "Default credentials on web UI",
+      "description": "Factory-default admin credentials are not changed, allowing trivial takeover of local config interface.",
+      "cra_clause": "Annex I Part I (1)",
+      "mitigation": "Force credential change on first boot; no universal default passwords",
+      "severity": "high"
+    }
+  ]
+}
