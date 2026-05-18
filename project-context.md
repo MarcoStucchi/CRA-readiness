@@ -3,7 +3,8 @@
 **Owner**: Principal Engineer, Cybersecurity — UL  
 **Started**: May 2026  
 **Status**: Architecture design phase  
-**Last updated**: 2026-05-18 (session 3)
+**Last updated**: 2026-05-18 (session 4)  
+**Filename**: `project-context.md` (repo root — renamed from `cybersec_readiness_project.md`)
 
 ---
 
@@ -16,7 +17,7 @@ Build a Claude-assisted system to assess the **cybersecurity readiness level of 
 ## Knowledge base — file inventory
 
 All files reside in:
-`C:\Users\ITMASTU1\OneDrive - ABB\Documents\Standards\EU commission\CRA\AI knowledgebase\`
+`knowledgebase/` (repo root) — synced from `C:\Users\ITMASTU1\OneDrive - ABB\Documents\Standards\EU commission\CRA\AI knowledgebase\`
 
 ### CRA regulatory files (Regulation EU 2024/2847 — adopted 23 Oct 2024)
 
@@ -277,31 +278,61 @@ Estimated cost per full product assessment: **a few cents** (20–30 API calls �
 
 ---
 
+## Repository structure (`cra-readiness-poc/`)
+
+```
+cra-readiness-poc/
+├── archetypes/
+│   ├── manifest.json              ← lists available archetypes (to build)
+│   ├── iot-gateway.json           ← ✓ done (7 components, 4 connections, 6 threat hints)
+│   └── consumer-thermostat.json   ← POC archetype (to build)
+├── knowledgebase/
+│   ├── CRA_Main_Body_Summary.md
+│   ├── CRA_Annex_1.md … CRA_Annex_8.md
+│   ├── cybersecurity_standards_evaluation_guide.md
+│   ├── CRA_requirements_standards_mapping.md
+│   ├── ETSI_EN_303_645_V3_1_3.md
+│   ├── standards/                 ← future: iec_62443.md, common_criteria.md…
+│   └── README.md
+├── sessions/                      ← gitignored — live elicitation state per run
+├── output/                        ← gitignored — Threat Dragon JSON + gap tables
+├── elicit.py                      ← ✓ done — Path C elicitation engine
+├── assess_path_a.py               ← future — Path A gap analysis
+├── requirements.txt
+├── .env.example                   ← ANTHROPIC_API_KEY placeholder
+├── .gitignore                     ← excludes: .env, sessions/, output/, __pycache__/
+└── project-context.md             ← this file
+```
+
+---
+
 ## Open questions / next decisions
 
-- [x] **Elicitation interface**: ~~browser artifact vs Claude Code~~ → **resolved: Claude Code Python CLI**
-- [x] **Archetype DB storage**: ~~SQLite vs Postgres~~ → **resolved: flat JSON files for now**
-- [x] **Draft first archetype**: → **resolved: `archetypes/iot-gateway.json` delivered**
-- [x] **Threat Dragon JSON generation**: → **resolved: implemented in `build_threat_dragon_model()` in `elicit.py`**
-- [x] **Standard KB format**: → **resolved: markdown files per document, stored in OneDrive folder alongside project files**
-- [ ] **Archetype manifest**: add a `manifest.json` listing all available archetypes with display names
-- [ ] **Report format**: what does the final readiness report look like? Who is the audience — internal UL assessors, product manufacturers, regulators?
-- [ ] **Standard KB format**: how are CRA Annex I and the applicable standards stored for Claude to reason over? Chunked markdown? Structured JSON?
-- [ ] **Path A prototype**: CRA KB + standard markdown → gap table (not yet started)
-- [ ] **Cross-path synthesis**: how do Path A gap table and Path B STRIDE output merge into the final readiness report?
-- [ ] **Additional archetypes**: ICS controller, medical device, consumer IoT
+- [x] **Elicitation interface** → Claude Code Python CLI
+- [x] **Archetype DB storage** → flat JSON files
+- [x] **First archetype** → `iot-gateway.json` delivered
+- [x] **Threat Dragon JSON generation** → implemented in `elicit.py`
+- [x] **Standard KB format** → markdown files in `knowledgebase/`
+- [x] **Project folder structure** → agreed (see repo structure above)
+- [x] **POC product** → connected thermostat (consumer IoT, EN 303 645)
+- [ ] **Archetype manifest** — `archetypes/manifest.json` not yet created
+- [ ] **consumer-thermostat.json** — POC archetype to build next
+- [ ] **POC elicitation run** — `elicit.py` not yet tested end-to-end
+- [ ] **Path A prototype** — `assess_path_a.py` not yet started
+- [ ] **Cross-path synthesis** — how STRIDE output + gap table merge into report
+- [ ] **Additional archetypes** — consumer IoT variants, future ICS
 
 ---
 
 ## Proposed next steps
 
-1. Add missing standard files to KB — priority: `iec_62443.md` (needed for IACS/IIoT assessments, most common at UL), then `common_criteria_iso_15408.md` (Annex IV critical products)
-2. Add `archetypes/manifest.json` to list available archetypes; fix archetype name resolution in `elicit.py`
-3. Run `elicit.py` against a real product to validate the interview loop and Threat Dragon JSON output
+1. Build `archetypes/consumer-thermostat.json` — POC archetype for a connected thermostat (consumer IoT, EN 303 645 scope)
+2. Add `archetypes/manifest.json` and fix archetype name resolution in `elicit.py`
+3. Run `elicit.py --archetype consumer-thermostat` against the thermostat as a POC dry run
 4. Add prompt caching to `elicit.py` (system prompt + archetype JSON repeated every turn — 90% cost saving)
-5. Build Path A prototype: load CRA_Annex_1.md + routing guide + CRA_requirements_standards_mapping.md → Claude identifies applicable standard(s) and produces gap table
-6. Design the cross-path synthesis layer: STRIDE threats (Path B) + compliance gaps (Path A) → readiness report
-7. Draft additional archetypes: ICS controller, consumer IoT device
+5. Build `assess_path_a.py` — Path A prototype: load CRA Annex I + routing guide + EN 303 645 → gap table for the thermostat
+6. Add missing standard files to KB as needed — `common_criteria_iso_15408.md` next after EN 303 645 proven
+7. Design the cross-path synthesis layer: STRIDE threats (Path B) + compliance gaps (Path A) → readiness report
 
 ---
 
@@ -312,6 +343,7 @@ Estimated cost per full product assessment: **a few cents** (20–30 API calls �
 | 2026-05-17 | Initial architecture design; three-path system; OWASP Threat Dragon selection; archetype DB schema design with ERD; variable-length array strategy |
 | 2026-05-18 (s2) | Decided on Claude Code Python CLI for elicitation interface; built `elicit.py` (full interview loop, session persistence, Threat Dragon JSON builder); built `archetypes/iot-gateway.json` (first archetype — 7 components, 4 connections, 6 STRIDE threat hints with CRA clause refs); clarified API access and pricing (Sonnet 4.6 at $3/$15 per MTok; ~cents per assessment) |
 | 2026-05-18 (s3) | Integrated knowledge base: 12 files uploaded (CRA Annex I–VIII, CRA main body summary, standards routing guide, JRC/ENISA requirements-to-standards mapping, ETSI EN 303 645 v3.1.3); full KB inventory documented with role of each file in Path A; identified 7 missing standard files still to be added; KB now covers full CRA Annex I requirement set with cross-standard gap analysis |
+| 2026-05-18 (s4) | Agreed repo folder structure (`cra-readiness-poc/`); renamed `cybersec_readiness_project.md` → `project-context.md` at repo root; decided POC product = connected thermostat (consumer IoT, EN 303 645); next step = `consumer-thermostat.json` archetype |
 
 ---
 
