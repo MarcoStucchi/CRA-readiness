@@ -1,2 +1,2 @@
 # CRA-readiness
-**CRA** readiness project to test **Claude AI** in implementing a process
+Test project to implement a **Claude AI** supported process to evaluate compliance to Cyber Resilience Act for different types of consumer products.
