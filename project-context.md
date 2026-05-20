@@ -3,8 +3,9 @@
 **Owner**: Principal Engineer, Cybersecurity — UL  
 **Started**: May 2026  
 **Status**: Architecture design phase  
-**Last updated**: 2026-05-18 (session 4)  
-**Filename**: `project-context.md` (repo root — renamed from `cybersec_readiness_project.md`)
+**Last updated**: 2026-05-20 (session 6)  
+**Status**: POC elicitation complete — architecture evolution planned  
+**Filename**: `project-context.md` (repo root)
 
 ---
 
@@ -249,6 +250,27 @@ Industrial IoT gateway archetype with:
 - 4 connection templates with trust boundary flags
 - 6 pre-seeded STRIDE threat hints with CRA Annex I clause references
 
+### `archetypes/consumer-thermostat.json` — POC archetype
+Connected consumer thermostat archetype (EN 303 645 scope, CRA class: default) with:
+- 13 component templates (cloud backend, mobile app, local display, Wi-Fi, OTA firmware agent, secure credential store, local control logic, HVAC relay, environmental sensors, debug interfaces, local data store, BLE, telemetry service)
+- 8 connection templates covering all major data flows with trust boundary flags
+- 12 pre-seeded STRIDE threat hints, each cross-referenced to both EN 303 645 provision AND CRA Annex I clause
+- Two new archetype fields vs iot-gateway: `en303645_provisions[]` per component and `en303645_provision` per threat hint
+
+### `elicit.py` — bug fixes applied during POC run
+The following issues were found and fixed during the first end-to-end POC run:
+
+| Issue | Fix |
+|---|---|
+| `claude-sonnet-4-20250514` deprecation warning | Updated model to `claude-sonnet-4-6` |
+| `JSONDecodeError` when Claude returns non-JSON | Added `_extract_json()` with brace-matching + 3-attempt retry loop with corrective prompt |
+| `NotRenderableError: Unable to render None` | Added null guards on all `result` fields in `interview_element()` |
+| `KeyError: 'name'` on connection templates | Connection templates have no `name` field — built label from source/target IDs and protocols |
+| `UnicodeEncodeError` on Windows (cp1252) | All file read/write operations now use `encoding="utf-8"` explicitly; Unicode arrows replaced with ASCII `->` |
+| `SessionState` loads empty/corrupted file | `save_session()` now writes atomically via `.tmp` → rename; `load_session()` validates before parsing |
+| `KeyError: 'cells'` in summary panel | Fixed path to `diagramJson.cells` in threat count expression |
+| Threat Dragon schema validation warning | Completely rewrote `build_threat_dragon_model()` to match exact v2 schema: `diagramJson.cells`, full STRIDE names, `attrs` labels, `hasOpenThreats`, `smooth`, `labels[]`, `vertices[]` |
+
 ---
 
 ## API access and pricing
@@ -285,7 +307,7 @@ cra-readiness-poc/
 ├── archetypes/
 │   ├── manifest.json              ← lists available archetypes (to build)
 │   ├── iot-gateway.json           ← ✓ done (7 components, 4 connections, 6 threat hints)
-│   └── consumer-thermostat.json   ← POC archetype (to build)
+│   └── consumer-thermostat.json   ← ✓ done (13 components, 8 connections, 12 threat hints)
 ├── knowledgebase/
 │   ├── CRA_Main_Body_Summary.md
 │   ├── CRA_Annex_1.md … CRA_Annex_8.md
@@ -315,9 +337,11 @@ cra-readiness-poc/
 - [x] **Standard KB format** → markdown files in `knowledgebase/`
 - [x] **Project folder structure** → agreed (see repo structure above)
 - [x] **POC product** → connected thermostat (consumer IoT, EN 303 645)
+- [x] **consumer-thermostat.json** → delivered (13 components, 8 connections, 12 threat hints)
+- [x] **POC elicitation run** → completed end-to-end; Threat Dragon JSON generated and validated
+- [x] **Threat Dragon v2 schema** → `build_threat_dragon_model()` rewritten to exact spec
 - [ ] **Archetype manifest** — `archetypes/manifest.json` not yet created
-- [ ] **consumer-thermostat.json** — POC archetype to build next
-- [ ] **POC elicitation run** — `elicit.py` not yet tested end-to-end
+- [ ] **Prompt caching** — system prompt + archetype JSON repeat every turn; 90% cost saving available
 - [ ] **Path A prototype** — `assess_path_a.py` not yet started
 - [ ] **Cross-path synthesis** — how STRIDE output + gap table merge into report
 - [ ] **Additional archetypes** — consumer IoT variants, future ICS
@@ -326,13 +350,80 @@ cra-readiness-poc/
 
 ## Proposed next steps
 
-1. Build `archetypes/consumer-thermostat.json` — POC archetype for a connected thermostat (consumer IoT, EN 303 645 scope)
-2. Add `archetypes/manifest.json` and fix archetype name resolution in `elicit.py`
-3. Run `elicit.py --archetype consumer-thermostat` against the thermostat as a POC dry run
-4. Add prompt caching to `elicit.py` (system prompt + archetype JSON repeated every turn — 90% cost saving)
-5. Build `assess_path_a.py` — Path A prototype: load CRA Annex I + routing guide + EN 303 645 → gap table for the thermostat
-6. Add missing standard files to KB as needed — `common_criteria_iso_15408.md` next after EN 303 645 proven
-7. Design the cross-path synthesis layer: STRIDE threats (Path B) + compliance gaps (Path A) → readiness report
+1. Add `archetypes/manifest.json` and fix archetype name resolution in `elicit.py`
+2. Add prompt caching to `elicit.py` — system prompt + archetype JSON cached = ~90% cost saving per session
+3. Build `assess_path_a.py` — Path A prototype: load CRA Annex I + routing guide + EN 303 645 → gap table for the thermostat
+4. Run a second clean POC elicitation with the fixed script and validate the Threat Dragon output visually
+5. Design the cross-path synthesis layer: STRIDE threats (Path B) + compliance gaps (Path A) → readiness report
+6. Add missing standard files to KB — `common_criteria_iso_15408.md` for Annex IV products
+
+---
+
+## TODO — deferred items
+
+These are confirmed future work items, parked deliberately and not yet scheduled.
+
+---
+
+### TODO-1: Trust boundaries in Threat Dragon output
+
+**Status**: Data exists, rendering not implemented  
+**Priority**: High — trust boundaries are a core DFD concept; their absence makes the Threat Dragon output incomplete for a real assessment
+
+**Current state**: The `crosses_trust_boundary` and `trust_boundary_name` fields are correctly populated in `connection_templates` across all archetypes (e.g. `"Home network / Internet boundary"`, `"Physical proximity boundary"`). However `build_threat_dragon_model()` in `elicit.py` ignores these fields entirely — no `tm.Boundary` cells are emitted in the output `.td.json`.
+
+**What needs to be built**:
+- Change the layout algorithm in `build_threat_dragon_model()` to be boundary-aware:
+  1. Collect all unique `trust_boundary_name` values from confirmed connections
+  2. Assign each confirmed component to a zone (external entities = outside, processes/datastores = inside, cloud entities = far outside)
+  3. Place component zones in horizontal bands with gaps between them
+  4. Emit a `tm.Boundary` cell (type `"tm.Boundary"`, source/target as x/y coordinates) as a horizontal line in each gap
+- `tm.Boundary` is a coordinate-based line, not connected to component IDs — placement depends on the layout algorithm knowing where components landed
+
+**Impact**: Without trust boundaries, the Threat Dragon DFD does not meet the standard representation expected in a formal threat model review.
+
+---
+
+### TODO-2: Architecture evolution — Phase 2 and Phase 3
+
+**Status**: Planned, not yet designed in detail  
+**Priority**: Medium — relevant when more than one assessor uses the system or when the archetype registry grows beyond a few files
+
+#### Context and motivation
+
+The current Phase 1 architecture couples three concerns in a single script (`elicit.py`): archetype authoring, assessment execution, and output generation. This works for a single expert user but does not scale. Two key insights from the POC:
+
+1. **Archetypes are synthesised, not validated** — the current `consumer-thermostat.json` and `iot-gateway.json` were generated by Claude from general knowledge, not derived from real UL assessments or validated threat libraries. An experienced professional must review and adjust them. There is currently no tooling to support that review at human level (no editor, no diff tool, no validation schema enforcement).
+
+2. **Knowledgebase is the premium asset** — the CRA and standards markdown files are authoritative and will grow over time. The archetype registry is currently the weakest link but has the highest potential for improvement through real assessment experience.
+
+#### Phase 2 — separated knowledge system / assessment tool
+
+**Goal**: Decouple archetype authoring (expert work) from assessment execution (analyst work).
+
+**New components to build**:
+- `archetype-builder.py` — Claude-powered guided tool for creating and editing archetypes in plain language; validates against schema before writing; maintains a changelog per archetype file
+- `registry/` folder replacing flat `archetypes/` — adds `manifest.json` with versioning (semver per archetype), so every session record references the exact archetype version used
+- `archetype-validator.py` — schema validation script to run in CI on every registry change; catches missing required fields, invalid `threat_dragon_shape` values, broken component ID references in connections
+- Archetype update workflow: experienced professional edits archetype → validator runs → changelog entry added → version bumped → existing sessions remain pinned to old version
+
+**Archetype ownership principle**: archetypes are maintained by cybersecurity experts (UL engineers). Analysts run assessments against published archetype versions. The two roles are separated.
+
+#### Phase 3 — multi-product / multi-assessor platform
+
+**Goal**: Turn the system into a shared UL asset enabling longitudinal compliance tracking across a product portfolio.
+
+**New components to build**:
+- `product_database/` — persistent store of completed assessments (session JSON + Threat Dragon output + gap table), indexed by product, archetype version, and assessment date
+- `delta_report.py` — compares two assessments of the same product across time: what changed in the product model, what changed in the applicable standard, what the new gap picture looks like
+- `knowledgebase API` — versioned access to KB files so assessments can reference the CRA/standard version in force at assessment date (CRA implementing acts evolve through 2025-2027)
+- Web UI or structured CLI — multi-assessor workflow, session handoff, review and sign-off
+
+**Key capability unlocked**: CRA compliance evolution tracked across product versions and standard updates. A product assessed today against EN 303 645 v3.1.3 and CRA Annex I (2024) can be re-assessed in 2026 when implementing acts are finalised, with a diff showing exactly what changed and what new gaps appeared.
+
+**Archetype round-trip (deferred)**: Post-assessment, an expert opens the `.td.json` in Threat Dragon, corrects the diagram visually, and a reverse-mapping script reads those corrections back into the archetype. This closes the loop between real assessment experience and the registry — parked until Phase 2 archetype tooling is stable.
+
+---
 
 ---
 
@@ -344,6 +435,8 @@ cra-readiness-poc/
 | 2026-05-18 (s2) | Decided on Claude Code Python CLI for elicitation interface; built `elicit.py` (full interview loop, session persistence, Threat Dragon JSON builder); built `archetypes/iot-gateway.json` (first archetype — 7 components, 4 connections, 6 STRIDE threat hints with CRA clause refs); clarified API access and pricing (Sonnet 4.6 at $3/$15 per MTok; ~cents per assessment) |
 | 2026-05-18 (s3) | Integrated knowledge base: 12 files uploaded (CRA Annex I–VIII, CRA main body summary, standards routing guide, JRC/ENISA requirements-to-standards mapping, ETSI EN 303 645 v3.1.3); full KB inventory documented with role of each file in Path A; identified 7 missing standard files still to be added; KB now covers full CRA Annex I requirement set with cross-standard gap analysis |
 | 2026-05-18 (s4) | Agreed repo folder structure (`cra-readiness-poc/`); renamed `cybersec_readiness_project.md` → `project-context.md` at repo root; decided POC product = connected thermostat (consumer IoT, EN 303 645); next step = `consumer-thermostat.json` archetype |
+| 2026-05-19 (s5) | Built `consumer-thermostat.json` (13 components, 8 connections, 12 STRIDE threat hints with dual EN 303 645 + CRA Annex I references); ran first end-to-end POC elicitation; fixed 8 bugs in `elicit.py` (model deprecation, JSON parsing, null guards, KeyError on connection name, Windows Unicode encoding, atomic session save, Threat Dragon v2 schema); POC Threat Dragon output successfully generated and loaded in Threat Dragon; elicit.py now stable |
+| 2026-05-20 (s6) | Discussed architecture separation: knowledge system vs assessment tool; clarified that archetypes are Claude-synthesised (not validated) while knowledgebase is authoritative; discussed trust boundary gap in Threat Dragon output; planned Phase 2 (separated knowledge/assessment) and Phase 3 (multi-product platform) evolution; added TODO section to project context; archetype human-editing and Threat Dragon round-trip deferred to experienced professional review |
 
 ---
 
