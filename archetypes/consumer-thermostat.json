@@ -3,11 +3,14 @@
   "name": "Connected consumer thermostat",
   "category": "consumer-IoT",
   "cra_class": "default",
-  "applicable_standards": ["ETSI EN 303 645 v3.1.3", "CRA Annex I"],
-  "description": "A Wi-Fi connected thermostat for residential heating/cooling control, with cloud connectivity, mobile app interface, local display and controls, and OTA firmware updates. Typical examples: Nest, Ecobee, Tado, Honeywell Home T6.",
-
+  "applicable_standards": [
+    "ETSI EN 303 645 v3.1.3",
+    "EN 18031-1:2024",
+    "EN 18031-2:2024",
+    "CRA Annex I"
+  ],
+  "description": "A Wi-Fi connected thermostat for residential heating/cooling control, with cloud connectivity, mobile app interface, local display and controls, and OTA firmware updates. Typical examples: Nest, Ecobee, Tado, Honeywell Home T6. Subject to EN 303 645, EN 18031-1 and EN 18031-2 (mandatory under RED from August 2025), and CRA Annex I.",
   "component_templates": [
-
     {
       "id": "ct-001",
       "name": "Cloud backend service",
@@ -15,10 +18,26 @@
       "layer": "cloud",
       "required": true,
       "typical": true,
-      "security_properties": ["authentication", "encryption", "integrity", "availability"],
+      "security_properties": [
+        "authentication",
+        "encryption",
+        "integrity",
+        "availability"
+      ],
       "threat_dragon_shape": "external-entity",
-      "en303645_provisions": ["5.1-1", "5.1-3", "5.5-1", "5.5-7", "5.5-8", "5.8-2"],
-      "cra_annex1_clauses": ["Part I (2)(b)", "Part I (2)(c)", "Part I (2)(f)"],
+      "en303645_provisions": [
+        "5.1-1",
+        "5.1-3",
+        "5.5-1",
+        "5.5-7",
+        "5.5-8",
+        "5.8-2"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(b)",
+        "Part I (2)(c)",
+        "Part I (2)(f)"
+      ],
       "elicitation_questions": [
         "Does the thermostat connect to a manufacturer cloud service or backend?",
         "What protocol is used for cloud communication? (e.g. MQTT, HTTPS, WebSocket, proprietary)",
@@ -26,7 +45,6 @@
         "Is the cloud connection required for basic thermostat operation (heating/cooling control), or does the device work locally without it?"
       ]
     },
-
     {
       "id": "ct-002",
       "name": "Mobile companion app",
@@ -34,10 +52,24 @@
       "layer": "application",
       "required": false,
       "typical": true,
-      "security_properties": ["authentication", "encryption", "access-control"],
+      "security_properties": [
+        "authentication",
+        "encryption",
+        "access-control"
+      ],
       "threat_dragon_shape": "external-entity",
-      "en303645_provisions": ["5.1-1", "5.1-3", "5.1-4", "5.5-1", "5.5-5", "5.8-2"],
-      "cra_annex1_clauses": ["Part I (2)(b)", "Part I (2)(c)"],
+      "en303645_provisions": [
+        "5.1-1",
+        "5.1-3",
+        "5.1-4",
+        "5.5-1",
+        "5.5-5",
+        "5.8-2"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(b)",
+        "Part I (2)(c)"
+      ],
       "elicitation_questions": [
         "Does the product include a companion mobile app (iOS and/or Android)?",
         "Does the app communicate with the thermostat directly (local Wi-Fi / Bluetooth) or only through the cloud?",
@@ -45,7 +77,6 @@
         "Does the app require account authentication to access thermostat controls?"
       ]
     },
-
     {
       "id": "ct-003",
       "name": "Local display and user interface",
@@ -53,10 +84,21 @@
       "layer": "application",
       "required": false,
       "typical": true,
-      "security_properties": ["access-control", "input-validation"],
+      "security_properties": [
+        "access-control",
+        "input-validation"
+      ],
       "threat_dragon_shape": "process",
-      "en303645_provisions": ["5.1-4", "5.1-5", "5.12-1", "5.13-1A"],
-      "cra_annex1_clauses": ["Part I (2)(b)", "Part I (2)(j)"],
+      "en303645_provisions": [
+        "5.1-4",
+        "5.1-5",
+        "5.12-1",
+        "5.13-1A"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(b)",
+        "Part I (2)(j)"
+      ],
       "elicitation_questions": [
         "Does the thermostat have a local display (LCD, e-ink, LED) showing temperature and status?",
         "Does the device have physical controls? (touch buttons, capacitive touch, rotary dial)",
@@ -64,7 +106,6 @@
         "Is authentication required to access any local settings? (e.g. installer PIN, access code)"
       ]
     },
-
     {
       "id": "ct-004",
       "name": "Wi-Fi interface",
@@ -72,10 +113,24 @@
       "layer": "hardware",
       "required": true,
       "typical": true,
-      "security_properties": ["authentication", "encryption", "access-control"],
+      "security_properties": [
+        "authentication",
+        "encryption",
+        "access-control"
+      ],
       "threat_dragon_shape": "external-entity",
-      "en303645_provisions": ["5.1-1", "5.1-3", "5.5-1", "5.6-1", "5.6-2"],
-      "cra_annex1_clauses": ["Part I (2)(b)", "Part I (2)(c)", "Part I (2)(h)"],
+      "en303645_provisions": [
+        "5.1-1",
+        "5.1-3",
+        "5.5-1",
+        "5.6-1",
+        "5.6-2"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(b)",
+        "Part I (2)(c)",
+        "Part I (2)(h)"
+      ],
       "elicitation_questions": [
         "Which Wi-Fi standards does the device support? (802.11 b/g/n/ac/ax, 2.4GHz only or dual-band)",
         "What Wi-Fi security protocols are supported? (WPA2, WPA3)",
@@ -83,7 +138,6 @@
         "Is there a local API accessible over Wi-Fi? (e.g. REST API for home automation integration)"
       ]
     },
-
     {
       "id": "ct-005",
       "name": "Firmware and OTA update agent",
@@ -91,10 +145,32 @@
       "layer": "firmware",
       "required": true,
       "typical": true,
-      "security_properties": ["integrity", "authentication", "rollback-protection", "availability"],
+      "security_properties": [
+        "integrity",
+        "authentication",
+        "rollback-protection",
+        "availability"
+      ],
       "threat_dragon_shape": "process",
-      "en303645_provisions": ["5.3-2", "5.3-3", "5.3-7", "5.3-8", "5.3-9", "5.3-10", "5.3-13", "5.7-1"],
-      "cra_annex1_clauses": ["Part I (2)(c)", "Part I (2)(d)", "Part I (2)(k)", "Part I (2)(l)", "Part II (2)", "Part II (7)", "Part II (8)"],
+      "en303645_provisions": [
+        "5.3-2",
+        "5.3-3",
+        "5.3-7",
+        "5.3-8",
+        "5.3-9",
+        "5.3-10",
+        "5.3-13",
+        "5.7-1"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(c)",
+        "Part I (2)(d)",
+        "Part I (2)(k)",
+        "Part I (2)(l)",
+        "Part II (2)",
+        "Part II (7)",
+        "Part II (8)"
+      ],
       "elicitation_questions": [
         "Does the device support over-the-air (OTA) firmware updates?",
         "Are firmware updates delivered automatically, or does the user need to approve them?",
@@ -104,7 +180,6 @@
         "Does the device display a notification to the user when an update is available or has been applied?"
       ]
     },
-
     {
       "id": "ct-006",
       "name": "Secure credential and key store",
@@ -112,10 +187,22 @@
       "layer": "firmware",
       "required": true,
       "typical": true,
-      "security_properties": ["confidentiality", "integrity", "tamper-resistance"],
+      "security_properties": [
+        "confidentiality",
+        "integrity",
+        "tamper-resistance"
+      ],
       "threat_dragon_shape": "datastore",
-      "en303645_provisions": ["5.4-1", "5.4-2", "5.4-3", "5.4-4"],
-      "cra_annex1_clauses": ["Part I (2)(c)", "Part I (2)(d)"],
+      "en303645_provisions": [
+        "5.4-1",
+        "5.4-2",
+        "5.4-3",
+        "5.4-4"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(c)",
+        "Part I (2)(d)"
+      ],
       "elicitation_questions": [
         "Where are Wi-Fi credentials, cloud authentication tokens, and TLS certificates stored on the device?",
         "Are credentials stored in plaintext in flash, or is there hardware-backed secure storage? (TEE, secure element, encrypted partition)",
@@ -123,7 +210,6 @@
         "Are per-device unique keys used for cloud authentication, or is a shared secret used across all units of the same model?"
       ]
     },
-
     {
       "id": "ct-007",
       "name": "Local scheduling and control logic",
@@ -131,10 +217,23 @@
       "layer": "application",
       "required": true,
       "typical": true,
-      "security_properties": ["availability", "integrity", "input-validation"],
+      "security_properties": [
+        "availability",
+        "integrity",
+        "input-validation"
+      ],
       "threat_dragon_shape": "process",
-      "en303645_provisions": ["5.9-1", "5.9-2", "5.13-1A", "5.13-1B"],
-      "cra_annex1_clauses": ["Part I (2)(d)", "Part I (2)(f)", "Part I (1)"],
+      "en303645_provisions": [
+        "5.9-1",
+        "5.9-2",
+        "5.13-1A",
+        "5.13-1B"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(d)",
+        "Part I (2)(f)",
+        "Part I (1)"
+      ],
       "elicitation_questions": [
         "Does the thermostat operate independently when the cloud connection is unavailable? (local schedule execution, manual setpoint)",
         "How does the device behave after a power outage — does it recover to its last schedule automatically?",
@@ -142,7 +241,6 @@
         "Does the device validate commands received from the cloud or app before applying them to HVAC outputs?"
       ]
     },
-
     {
       "id": "ct-008",
       "name": "Heating/cooling equipment relay or output",
@@ -150,17 +248,25 @@
       "layer": "hardware",
       "required": true,
       "typical": true,
-      "security_properties": ["availability", "integrity"],
+      "security_properties": [
+        "availability",
+        "integrity"
+      ],
       "threat_dragon_shape": "external-entity",
-      "en303645_provisions": ["5.9-2", "5.13-1B"],
-      "cra_annex1_clauses": ["Part I (2)(f)", "Part I (2)(g)"],
+      "en303645_provisions": [
+        "5.9-2",
+        "5.13-1B"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(f)",
+        "Part I (2)(g)"
+      ],
       "elicitation_questions": [
         "How does the thermostat control the HVAC system — direct relay switching (24V wiring), or a proprietary smart HVAC protocol?",
         "Is the HVAC control interface bi-directional (thermostat receives status from HVAC) or output-only?",
         "Is there any safety interlock preventing unreasonable commands being sent to HVAC equipment? (e.g. simultaneous heating and cooling inhibit)"
       ]
     },
-
     {
       "id": "ct-009",
       "name": "Temperature and environmental sensors",
@@ -168,10 +274,20 @@
       "layer": "hardware",
       "required": true,
       "typical": true,
-      "security_properties": ["integrity", "availability"],
+      "security_properties": [
+        "integrity",
+        "availability"
+      ],
       "threat_dragon_shape": "process",
-      "en303645_provisions": ["5.8-3", "5.13-1B", "6-1"],
-      "cra_annex1_clauses": ["Part I (2)(d)", "Part I (2)(e)"],
+      "en303645_provisions": [
+        "5.8-3",
+        "5.13-1B",
+        "6-1"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(d)",
+        "Part I (2)(e)"
+      ],
       "elicitation_questions": [
         "What sensors does the device include? (temperature, humidity, occupancy/PIR, CO2, air quality, proximity)",
         "Is sensor data sent to the cloud, or only used locally?",
@@ -179,7 +295,6 @@
         "Are occupancy or presence sensing capabilities documented and disclosed to the user?"
       ]
     },
-
     {
       "id": "ct-010",
       "name": "Debug and hardware interfaces",
@@ -187,17 +302,26 @@
       "layer": "hardware",
       "required": false,
       "typical": true,
-      "security_properties": ["access-control", "authentication"],
+      "security_properties": [
+        "access-control",
+        "authentication"
+      ],
       "threat_dragon_shape": "external-entity",
-      "en303645_provisions": ["5.6-3", "5.6-4A", "5.6-4B"],
-      "cra_annex1_clauses": ["Part I (2)(b)", "Part I (2)(h)"],
+      "en303645_provisions": [
+        "5.6-3",
+        "5.6-4A",
+        "5.6-4B"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(b)",
+        "Part I (2)(h)"
+      ],
       "elicitation_questions": [
         "Does the PCB expose any debug interfaces accessible without opening the enclosure? (external UART, test pads on case edge)",
         "Are JTAG/SWD/UART debug ports present internally? Are they disabled in production firmware?",
         "Is secure boot enabled — is the bootloader locked against loading unsigned firmware?"
       ]
     },
-
     {
       "id": "ct-011",
       "name": "Local data store",
@@ -205,10 +329,22 @@
       "layer": "firmware",
       "required": false,
       "typical": true,
-      "security_properties": ["confidentiality", "integrity"],
+      "security_properties": [
+        "confidentiality",
+        "integrity"
+      ],
       "threat_dragon_shape": "datastore",
-      "en303645_provisions": ["5.4-1", "5.11-1", "5.11-3", "6-6"],
-      "cra_annex1_clauses": ["Part I (2)(c)", "Part I (2)(e)", "Part I (2)(m)"],
+      "en303645_provisions": [
+        "5.4-1",
+        "5.11-1",
+        "5.11-3",
+        "6-6"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(c)",
+        "Part I (2)(e)",
+        "Part I (2)(m)"
+      ],
       "elicitation_questions": [
         "What data does the thermostat store persistently on-device? (schedules, usage history, credentials, logs)",
         "Is any personal data stored locally (e.g. occupancy patterns, names associated with schedules)?",
@@ -216,7 +352,6 @@
         "Is the factory reset accessible from the local UI without requiring cloud connectivity?"
       ]
     },
-
     {
       "id": "ct-012",
       "name": "Bluetooth / BLE interface",
@@ -224,10 +359,23 @@
       "layer": "hardware",
       "required": false,
       "typical": true,
-      "security_properties": ["authentication", "access-control", "encryption"],
+      "security_properties": [
+        "authentication",
+        "access-control",
+        "encryption"
+      ],
       "threat_dragon_shape": "external-entity",
-      "en303645_provisions": ["5.1-1", "5.5-1", "5.6-1", "5.6-2"],
-      "cra_annex1_clauses": ["Part I (2)(b)", "Part I (2)(c)", "Part I (2)(h)"],
+      "en303645_provisions": [
+        "5.1-1",
+        "5.5-1",
+        "5.6-1",
+        "5.6-2"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(b)",
+        "Part I (2)(c)",
+        "Part I (2)(h)"
+      ],
       "elicitation_questions": [
         "Does the device include Bluetooth or BLE?",
         "What is BLE used for? (initial setup / provisioning only, ongoing remote control, proximity detection)",
@@ -235,7 +383,6 @@
         "Is BLE communication authenticated and encrypted?"
       ]
     },
-
     {
       "id": "ct-013",
       "name": "Telemetry and logging service",
@@ -243,10 +390,23 @@
       "layer": "application",
       "required": false,
       "typical": true,
-      "security_properties": ["confidentiality", "integrity", "data-minimisation"],
+      "security_properties": [
+        "confidentiality",
+        "integrity",
+        "data-minimisation"
+      ],
       "threat_dragon_shape": "process",
-      "en303645_provisions": ["5.10-1", "6-1", "6-4", "6-5", "6-6"],
-      "cra_annex1_clauses": ["Part I (2)(e)", "Part I (2)(j)"],
+      "en303645_provisions": [
+        "5.10-1",
+        "6-1",
+        "6-4",
+        "6-5",
+        "6-6"
+      ],
+      "cra_annex1_clauses": [
+        "Part I (2)(e)",
+        "Part I (2)(j)"
+      ],
       "elicitation_questions": [
         "Does the thermostat send telemetry or usage data to the manufacturer? (energy consumption, HVAC run times, error logs, feature usage)",
         "Is telemetry data sent to any third parties (analytics platforms, energy providers)?",
@@ -255,14 +415,16 @@
       ]
     }
   ],
-
   "connection_templates": [
-
     {
       "id": "cn-001",
       "source_component_id": "ct-007",
       "target_component_id": "ct-001",
-      "protocols": ["MQTT", "HTTPS", "WebSocket"],
+      "protocols": [
+        "MQTT",
+        "HTTPS",
+        "WebSocket"
+      ],
       "direction": "bidirectional",
       "crosses_trust_boundary": true,
       "trust_boundary_name": "Home network / Internet boundary",
@@ -274,12 +436,14 @@
         "Can the cloud service push commands to the thermostat (e.g. setpoint changes, firmware triggers) without user confirmation on the device?"
       ]
     },
-
     {
       "id": "cn-002",
       "source_component_id": "ct-002",
       "target_component_id": "ct-001",
-      "protocols": ["HTTPS", "WebSocket"],
+      "protocols": [
+        "HTTPS",
+        "WebSocket"
+      ],
       "direction": "bidirectional",
       "crosses_trust_boundary": true,
       "trust_boundary_name": "Home network / Internet boundary",
@@ -291,12 +455,14 @@
         "Can multiple user accounts access the same thermostat, and is there access control between accounts (owner vs guest)?"
       ]
     },
-
     {
       "id": "cn-003",
       "source_component_id": "ct-001",
       "target_component_id": "ct-005",
-      "protocols": ["HTTPS", "MQTT"],
+      "protocols": [
+        "HTTPS",
+        "MQTT"
+      ],
       "direction": "unidirectional",
       "crosses_trust_boundary": true,
       "trust_boundary_name": "Home network / Internet boundary",
@@ -308,12 +474,14 @@
         "Is there a mechanism for the device to verify it is downloading the update from a legitimate source and not a spoofed server?"
       ]
     },
-
     {
       "id": "cn-004",
       "source_component_id": "ct-007",
       "target_component_id": "ct-008",
-      "protocols": ["24V relay", "proprietary HVAC bus"],
+      "protocols": [
+        "24V relay",
+        "proprietary HVAC bus"
+      ],
       "direction": "unidirectional",
       "crosses_trust_boundary": false,
       "trust_boundary_name": "",
@@ -324,12 +492,13 @@
         "Is the heating output physically protected against unexpected activation? (e.g. hardware interlock, watchdog timer)"
       ]
     },
-
     {
       "id": "cn-005",
       "source_component_id": "ct-009",
       "target_component_id": "ct-013",
-      "protocols": ["internal"],
+      "protocols": [
+        "internal"
+      ],
       "direction": "unidirectional",
       "crosses_trust_boundary": false,
       "trust_boundary_name": "",
@@ -340,12 +509,14 @@
         "How long is sensor data retained on the device before being overwritten or deleted?"
       ]
     },
-
     {
       "id": "cn-006",
       "source_component_id": "ct-013",
       "target_component_id": "ct-001",
-      "protocols": ["HTTPS", "MQTT"],
+      "protocols": [
+        "HTTPS",
+        "MQTT"
+      ],
       "direction": "unidirectional",
       "crosses_trust_boundary": true,
       "trust_boundary_name": "Home network / Internet boundary",
@@ -357,12 +528,13 @@
         "Does the manufacturer's privacy policy clearly state what telemetry data is collected, for how long, and with whom it is shared?"
       ]
     },
-
     {
       "id": "cn-007",
       "source_component_id": "ct-012",
       "target_component_id": "ct-007",
-      "protocols": ["BLE GATT"],
+      "protocols": [
+        "BLE GATT"
+      ],
       "direction": "bidirectional",
       "crosses_trust_boundary": true,
       "trust_boundary_name": "Physical proximity boundary",
@@ -374,12 +546,15 @@
         "Is the BLE interface disabled or put into non-discoverable mode after provisioning?"
       ]
     },
-
     {
       "id": "cn-008",
       "source_component_id": "ct-004",
       "target_component_id": "ct-007",
-      "protocols": ["Wi-Fi 802.11", "local REST API", "mDNS"],
+      "protocols": [
+        "Wi-Fi 802.11",
+        "local REST API",
+        "mDNS"
+      ],
       "direction": "bidirectional",
       "crosses_trust_boundary": true,
       "trust_boundary_name": "Home LAN boundary",
@@ -392,9 +567,7 @@
       ]
     }
   ],
-
   "threat_hints": [
-
     {
       "id": "th-001",
       "component_type": "external-entity",
@@ -407,7 +580,6 @@
       "mitigation": "Mutual TLS with pinned server certificate; validate broker hostname against hardcoded allowlist",
       "severity": "high"
     },
-
     {
       "id": "th-002",
       "component_type": "process",
@@ -420,7 +592,6 @@
       "mitigation": "Per-device or model-specific firmware signing; hardware-rooted verification at boot; anti-rollback via version counter in secure storage",
       "severity": "high"
     },
-
     {
       "id": "th-003",
       "component_type": "datastore",
@@ -433,7 +604,6 @@
       "mitigation": "Encrypt credential storage with hardware-backed key (TEE, secure element); disable debug interfaces in production",
       "severity": "high"
     },
-
     {
       "id": "th-004",
       "component_type": "external-entity",
@@ -446,7 +616,6 @@
       "mitigation": "Permanently disable JTAG/SWD in production fuses; enable secure boot with hardware root of trust; no exposed debug test pads on external PCB edges",
       "severity": "high"
     },
-
     {
       "id": "th-005",
       "component_type": "external-entity",
@@ -459,7 +628,6 @@
       "mitigation": "Disable BLE after provisioning; require BLE-level pairing + application-layer auth token for any GATT write; set device to non-discoverable after setup",
       "severity": "medium"
     },
-
     {
       "id": "th-006",
       "component_type": "process",
@@ -472,7 +640,6 @@
       "mitigation": "Require authentication token for all local API calls; limit local API surface to read-only or require confirmation on device display for writes",
       "severity": "medium"
     },
-
     {
       "id": "th-007",
       "component_type": "external-entity",
@@ -485,7 +652,6 @@
       "mitigation": "Explicit disclosure of all sensing capabilities and data recipients; opt-in consent for non-essential data collection; data minimisation — aggregate only, no raw occupancy timestamps to cloud",
       "severity": "medium"
     },
-
     {
       "id": "th-008",
       "component_type": "process",
@@ -498,7 +664,6 @@
       "mitigation": "Onboard schedule execution must be independent of cloud connectivity; fail-safe minimum temperature maintained even without network; graceful reconnection with exponential back-off",
       "severity": "medium"
     },
-
     {
       "id": "th-009",
       "component_type": "process",
@@ -511,7 +676,6 @@
       "mitigation": "Unique per-device credentials generated at manufacture; force credential change on first login; no shared default passwords across product class",
       "severity": "high"
     },
-
     {
       "id": "th-010",
       "component_type": "datastore",
@@ -524,7 +688,6 @@
       "mitigation": "Factory reset must cryptographically erase or overwrite all user data partitions, including credentials, schedules and logs; accessible from local UI without cloud connectivity",
       "severity": "medium"
     },
-
     {
       "id": "th-011",
       "component_type": "process",
@@ -537,7 +700,6 @@
       "mitigation": "Device-side validation of commanded setpoints within safe physical bounds; rate-limiting of remote setpoint changes; local override always available without network",
       "severity": "high"
     },
-
     {
       "id": "th-012",
       "component_type": "process",

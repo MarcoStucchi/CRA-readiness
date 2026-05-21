@@ -9,7 +9,7 @@
 
 | Sector | Standard(s) | Proof Mechanism | Assessment Type |
 |---|---|---|---|
-| Consumer IoT | EN 303 645 | ETSI TS 103 701 test cases | Self-assessment |
+| Consumer IoT (wireless) | EN 303 645 + **EN 18031-1** + EN 18031-2 (if personal data) | ETSI TS 103 701 + RED DoC + notified body if restricted clauses | Self-assessment (RED DoC) |
 | Industrial / OT | IEC 62443 (4-1, 4-2) | Certification SL1–SL4 | Third-party |
 | Energy | IEC 62443 + IEC 62351 | Certification + protocol compliance evidence | Third-party |
 | Automotive | ISO/SAE 21434 + UNECE R155/R156 | CSMS audit + national type approval (EU) | OEM-driven |
@@ -19,7 +19,7 @@
 
 ---
 
-## 1. Consumer IoT → EN 303 645
+## 1. Consumer IoT → EN 303 645 + EN 18031
 
 **In-scope products:**
 - Smart home devices (speakers, TVs, thermostats, cameras)
@@ -31,10 +31,26 @@
 
 **Out of scope:** Industrial, medical, and automotive devices even if network-connected.
 
-**Proof mechanism:** ETSI TS 103 701 test cases + completed Implementation Conformance Statement (ICS)  
-**Assessment:** Manufacturer self-assessment; third-party assessment possible via TS 103 701  
-**Regulatory linkage:** Primary harmonised standard under EU Cyber Resilience Act (CRA) for default-category connected products; Clause 6 aligns with GDPR; maps directly to UK PSTI Act  
-**Dedicated file:** `en_303_645.md`
+> ⚠️ **Mandatory from 1 August 2025 — EN 18031 applies to all wireless (radio) consumer IoT products**
+> under the Radio Equipment Directive (RED). EN 303 645 remains the primary baseline but EN 18031-1
+> (and EN 18031-2 where personal data is processed) is now legally required for CE marking of
+> internet-connected radio equipment. Compliance with EN 303 645 does NOT automatically imply
+> EN 18031 compliance — delta assessment is required (especially for resilience [RLM] and sensing
+> documentation [GEC-7]).
+
+**Applicable standards — layered:**
+
+| Standard | Applies when | Mandatory? | Since |
+|---|---|---|---|
+| ETSI EN 303 645 | All consumer IoT | De facto (CRA harmonised standard candidate) | 2020 |
+| EN 18031-1:2024 | All internet-connected radio equipment | ✅ Yes (RED Art. 3(3)(d)) | 1 Aug 2025 |
+| EN 18031-2:2024 | Radio equipment processing personal/location data | ✅ Yes (RED Art. 3(3)(e)) | 1 Aug 2025 |
+| EN 18031-3:2024 | Radio equipment processing monetary value | ✅ Yes (RED Art. 3(3)(f)) | 1 Aug 2025 |
+
+**Proof mechanism:** ETSI TS 103 701 test cases + Implementation Conformance Statement (ICS) for EN 303 645; EU Declaration of Conformity (DoC) under RED for EN 18031; notified body required where restricted clauses apply (see OJ L 2025/138)
+**Assessment:** Manufacturer self-assessment (DoC); third-party assessment possible via TS 103 701 or where restricted EN 18031 clauses apply
+**Regulatory linkage:** EN 303 645 — primary harmonised standard candidate under CRA for default-category connected products; EN 18031 — mandatory under RED from August 2025; Clause 6 of EN 303 645 aligns with GDPR; maps to UK PSTI Act
+**Dedicated files:** `en_303_645.md`, `en_18031.md`
 
 ---
 
@@ -159,6 +175,7 @@ A product may fall under more than one standard. When overlap exists, always esc
 | Connected EV charger (consumer-facing) | IEC 62443 + IEC 62351 + EN 303 645 |
 | Wearable medical device | IEC 81001-5-1 + EN 303 645 |
 | Automotive HSM / secure element | ISO/SAE 21434 + Common Criteria |
+| Connected consumer thermostat / smart home device (Wi-Fi) | EN 303 645 + EN 18031-1 + EN 18031-2 |
 | Industrial gateway with cloud connectivity | IEC 62443 + ISO/IEC 27001 (org) |
 | Smart meter | IEC 62443 + IEC 62351 |
 
@@ -181,6 +198,7 @@ A product may fall under more than one standard. When overlap exists, always esc
 | File | Standard |
 |---|---|
 | `en_303_645.md` | ETSI EN 303 645 — Consumer IoT |
+| `en_18031.md` | EN 18031-1/2/3:2024 — Radio Equipment / Consumer IoT (mandatory under RED from Aug 2025) |
 | `iec_62443.md` | IEC 62443 — Industrial / OT |
 | `iec_62351.md` | IEC 62351 — Energy / Power Systems Protocols |
 | `iso_sae_21434.md` | ISO/SAE 21434 — Automotive Cybersecurity Engineering |

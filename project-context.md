@@ -3,8 +3,8 @@
 **Owner**: Principal Engineer, Cybersecurity — UL  
 **Started**: May 2026  
 **Status**: Architecture design phase  
-**Last updated**: 2026-05-20 (session 6)  
-**Status**: POC elicitation complete — architecture evolution planned  
+**Last updated**: 2026-05-20 (session 8)  
+**Status**: POC elicitation complete — EN 18031 series integrated into knowledgebase  
 **Filename**: `project-context.md` (repo root)
 
 ---
@@ -36,11 +36,19 @@ All files reside in:
 
 ### Standards mapping and routing files
 
+> ⚠️ **Important — ENISA mapping version note**: `CRA_requirements_standards_mapping.md` is based on the
+> draft CRA (COM(2022) 454), not the final Reg. EU 2024/2847. The clause structure differs: the draft had
+> Req 1, Req 2, and 3a–3k; the final text has (1) and (2)(a)–(2)(m). Clauses (l) and (m) are entirely
+> absent from the ENISA mapping. See `CRA_mapping_reconciliation.md` for the full translation table
+> and gap list before using this file in Path A.
+
 | File | Content | Role in the system |
 |---|---|---|
 | `cybersecurity_standards_evaluation_guide.md` | Product-to-standard routing guide across 7 sectors (consumer IoT, industrial/OT, energy, automotive, medical, critical components, organisational). Includes layered standards table and regulatory framework context. | **Path A routing input** — Claude uses this to select the applicable standard(s) for a product |
-| `CRA_requirements_standards_mapping.md` | JRC & ENISA joint analysis (EUR 31892 EN, 2024). For each CRA Annex I requirement: coverage table across 15+ standards, gap analysis, lifecycle stages. Covers all 13 security property requirements and 8 vulnerability handling requirements. Key finding: no single standard covers all CRA requirements; ETSI EN 303 645 has broadest coverage for consumer IoT. | **Path A gap analysis input** — maps each CRA clause to the best-covering standard clause(s) and identifies residual gaps |
+| `CRA_requirements_standards_mapping.md` | JRC & ENISA joint analysis (EUR 31892 EN, 2024). Based on **draft CRA COM(2022) 454** — see reconciliation note above. Coverage table across 15+ standards, gap analysis, lifecycle stages. Key finding: no single standard covers all CRA requirements; ETSI EN 303 645 has broadest coverage for consumer IoT. | **Path A gap analysis input** — use only in conjunction with `CRA_mapping_reconciliation.md` |
+| `CRA_mapping_reconciliation.md` | Reconciliation table mapping every ENISA draft clause identifier to the corresponding final-text clause. Documents 2 missing clauses (❌), 5 partial mappings (⚠️), and 7 manual gap items with suggested EN 303 645 interim mappings. Produced 2026-05-20. | **Path A correction layer** — mandatory companion to `CRA_requirements_standards_mapping.md`; ensures gap analysis references final CRA text |
 | `ETSI_EN_303_645_V3_1_3.md` | ETSI EN 303 645 v3.1.3 — Consumer IoT cybersecurity standard (13 provisions + 16 data protection provisions). Primary harmonised standard under CRA for default-category connected products. | **Path A evaluation criteria** — detailed requirement set for consumer IoT products |
+| `en_18031.md` | EN 18031-1/2/3:2024 — Common security requirements for radio equipment. Mandatory under RED from 1 August 2025. Three parts: -1 (internet-connected), -2 (personal data processing), -3 (monetary value). Includes requirement clause tables, mapping to EN 303 645, conformity assessment routes, and product applicability matrix. | **Path A evaluation criteria** — mandatory for all wireless consumer IoT; complements EN 303 645; required for CE marking under RED |
 
 ### Key regulatory facts for Path A logic
 
@@ -49,6 +57,7 @@ All files reside in:
 - **Minimum support period**: 5 years (unless expected lifetime is shorter)
 - **Patch availability**: security updates must remain available for minimum 10 years from issue date or remainder of support period, whichever is longer
 - **Medical devices (MDR/IVDR) and automotive (type approval)**: explicitly excluded from CRA scope
+- **EN 18031-1/2/3**: mandatory from 1 August 2025 under RED for all internet-connected radio equipment — applies NOW, before CRA full applicability (Dec 2027); compliance work directly supports future CRA conformity
 - **Penalties**: up to 2.5% of global annual turnover (or €15M) for Annex I violations
 
 ### Missing standard files (referenced in routing guide, not yet in KB)
@@ -437,6 +446,8 @@ The current Phase 1 architecture couples three concerns in a single script (`eli
 | 2026-05-18 (s4) | Agreed repo folder structure (`cra-readiness-poc/`); renamed `cybersec_readiness_project.md` → `project-context.md` at repo root; decided POC product = connected thermostat (consumer IoT, EN 303 645); next step = `consumer-thermostat.json` archetype |
 | 2026-05-19 (s5) | Built `consumer-thermostat.json` (13 components, 8 connections, 12 STRIDE threat hints with dual EN 303 645 + CRA Annex I references); ran first end-to-end POC elicitation; fixed 8 bugs in `elicit.py` (model deprecation, JSON parsing, null guards, KeyError on connection name, Windows Unicode encoding, atomic session save, Threat Dragon v2 schema); POC Threat Dragon output successfully generated and loaded in Threat Dragon; elicit.py now stable |
 | 2026-05-20 (s6) | Discussed architecture separation: knowledge system vs assessment tool; clarified that archetypes are Claude-synthesised (not validated) while knowledgebase is authoritative; discussed trust boundary gap in Threat Dragon output; planned Phase 2 (separated knowledge/assessment) and Phase 3 (multi-product platform) evolution; added TODO section to project context; archetype human-editing and Threat Dragon round-trip deferred to experienced professional review |
+| 2026-05-20 (s7) | Identified structural discrepancy between ENISA mapping (based on draft COM(2022) 454) and final CRA text (Reg. EU 2024/2847): Req1+Req2 merged into (1), 3a-3k became (2)(a)-(2)(k), two new clauses (l) and (m) added in final text; produced `CRA_mapping_reconciliation.md` with full clause translation table, 2 missing clauses (❌), 5 partial mappings (⚠️), 7 manual gap items with EN 303 645 interim mappings; file copied to `knowledgebase/` as `CRA_mapping_reconciliation.md` |
+| 2026-05-20 (s8) | Identified EN 18031 (not EN 10381) as mandatory RED standard for consumer wireless IoT from 1 Aug 2025; read STN EN 18031-1/2/3:2024 PDFs; produced `en_18031.md` KB file covering all three parts with clause tables, EN 303 645 mapping, conformity assessment routes, and product applicability matrix; updated `cybersecurity_standards_evaluation_guide.md` with EN 18031 in Consumer IoT section and layered standards table; updated `consumer-thermostat.json` applicable_standards to include EN 18031-1 and -2 |
 
 ---
 
