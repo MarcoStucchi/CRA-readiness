@@ -3,8 +3,8 @@
 **Owner**: Principal Engineer, Cybersecurity — UL  
 **Started**: May 2026  
 **Status**: Architecture design phase  
-**Last updated**: 2026-05-20 (session 8)  
-**Status**: POC elicitation complete — EN 18031 series integrated into knowledgebase  
+**Last updated**: 2026-05-22 (session 9 — final)  
+**Status**: POC complete — EN 18031 integrated — ready for Path A prototype  
 **Filename**: `project-context.md` (repo root)
 
 ---
@@ -101,11 +101,22 @@ Path A  Path C
 - Markdown file: product category → applicable standard mapping
 
 **Process**:
-1. Claude identifies the applicable standard from the product description (e.g. IEC 62443, EN 18031, ETSI EN 303 645)
-2. Claude cross-walks CRA Annex I clauses to specific standard clauses
-3. Gap analysis: which requirements are not demonstrably met
+1. Claude identifies the applicable standard(s) from the product description using `cybersecurity_standards_evaluation_guide.md`
+2. For consumer wireless IoT products **both** EN 303 645 and EN 18031 apply — they come from different regulatory instruments (CRA and RED respectively) and are not interchangeable:
+   - **EN 18031** is legally mandatory under RED from 1 August 2025 (CE marking requirement)
+   - **EN 303 645** is the primary CRA harmonised standard candidate (full CRA applicability: Dec 2027)
+   - Substantial overlap exists but EN 18031 is more prescriptive; EN 303 645 compliance does NOT automatically imply EN 18031 compliance
+3. Claude cross-walks each CRA Annex I clause to coverage in EN 303 645 AND EN 18031, using:
+   - `CRA_requirements_standards_mapping.md` (ENISA analysis — draft-based, use with `CRA_mapping_reconciliation.md`)
+   - `ETSI_EN_303_645_V3_1_3.md` (EN 303 645 provisions)
+   - `en_18031.md` (EN 18031 clause table + Annex C mapping to EN 303 645)
+4. Gap analysis structure per CRA clause:
+   ```
+   CRA Annex I clause → EN 303 645 coverage → EN 18031-1 coverage → EN 18031-2 coverage (if personal data) → Residual gap
+   ```
+5. Residual gaps after both standards are largely procedural (CVD policy, SBOM in EUVD, 10-year patch availability) — no technical standard covers these
 
-**Output**: Structured gap table with CRA clause ↔ standard clause references, compliance status, and remediation notes.
+**Output**: Structured gap table with CRA clause ↔ EN 303 645 clause ↔ EN 18031 clause, compliance status per standard, and remediation notes.
 
 ---
 
@@ -345,26 +356,35 @@ cra-readiness-poc/
 - [x] **Threat Dragon JSON generation** → implemented in `elicit.py`
 - [x] **Standard KB format** → markdown files in `knowledgebase/`
 - [x] **Project folder structure** → agreed (see repo structure above)
-- [x] **POC product** → connected thermostat (consumer IoT, EN 303 645)
+- [x] **POC product** → connected thermostat (consumer IoT, EN 303 645 + EN 18031)
 - [x] **consumer-thermostat.json** → delivered (13 components, 8 connections, 12 threat hints)
 - [x] **POC elicitation run** → completed end-to-end; Threat Dragon JSON generated and validated
 - [x] **Threat Dragon v2 schema** → `build_threat_dragon_model()` rewritten to exact spec
+- [x] **EN 18031 integration** → `en_18031.md` produced from PDFs; routing guide updated; thermostat archetype updated; dual-standard Path A structure defined
+- [x] **Dual-standard Path A structure** → EN 303 645 + EN 18031 both apply to consumer wireless IoT under different regulatory instruments; gap table must cover both
 - [ ] **Archetype manifest** — `archetypes/manifest.json` not yet created
 - [ ] **Prompt caching** — system prompt + archetype JSON repeat every turn; 90% cost saving available
-- [ ] **Path A prototype** — `assess_path_a.py` not yet started
+- [ ] **Path A prototype** — `assess_path_a.py` not yet started — see next steps for detailed spec
 - [ ] **Cross-path synthesis** — how STRIDE output + gap table merge into report
 - [ ] **Additional archetypes** — consumer IoT variants, future ICS
+- [ ] **EN 18031 threat hints** — `consumer-thermostat.json` threat hints reference EN 303 645 provisions; EN 18031 clause IDs (e.g. AUM-5, GEC-2) not yet added as cross-references
 
 ---
 
 ## Proposed next steps
 
-1. Add `archetypes/manifest.json` and fix archetype name resolution in `elicit.py`
-2. Add prompt caching to `elicit.py` — system prompt + archetype JSON cached = ~90% cost saving per session
-3. Build `assess_path_a.py` — Path A prototype: load CRA Annex I + routing guide + EN 303 645 → gap table for the thermostat
-4. Run a second clean POC elicitation with the fixed script and validate the Threat Dragon output visually
-5. Design the cross-path synthesis layer: STRIDE threats (Path B) + compliance gaps (Path A) → readiness report
-6. Add missing standard files to KB — `common_criteria_iso_15408.md` for Annex IV products
+1. **Add `archetypes/manifest.json`** — list of available archetypes with display names; fix name resolution in `elicit.py`
+2. **Add prompt caching to `elicit.py`** — system prompt + archetype JSON are repeated every API call; caching saves ~90% on input tokens per session
+3. **Build `assess_path_a.py`** — Path A prototype for consumer thermostat:
+   - Inputs: product description + session JSON (from elicit.py) + KB files
+   - Step 1: route to applicable standards (EN 303 645 + EN 18031-1 + EN 18031-2) using routing guide
+   - Step 2: for each CRA Annex I clause, query Claude with the relevant KB files and produce coverage assessment per standard
+   - Step 3: use `CRA_mapping_reconciliation.md` to correct ENISA draft-based coverage findings to final-text clause IDs
+   - Step 4: identify residual gaps (especially clauses (l), (m), EUVD registration, 10-year patch availability)
+   - Output: markdown gap table — CRA clause | EN 303 645 | EN 18031-1 | EN 18031-2 | gap | remediation
+4. **Add EN 18031 clause IDs to threat hints** in `consumer-thermostat.json` — each `threat_hint` currently has `en303645_provision`; add `en18031_clause` field (e.g. `"AUM-5"`, `"GEC-2"`) for dual-standard cross-referencing
+5. **Run second clean POC** — fresh elicitation + Path A gap table for the thermostat → validate both outputs together
+6. **Design cross-path synthesis** — STRIDE threats (Path B) + compliance gaps (Path A) → readiness report
 
 ---
 
@@ -448,14 +468,17 @@ The current Phase 1 architecture couples three concerns in a single script (`eli
 | 2026-05-20 (s6) | Discussed architecture separation: knowledge system vs assessment tool; clarified that archetypes are Claude-synthesised (not validated) while knowledgebase is authoritative; discussed trust boundary gap in Threat Dragon output; planned Phase 2 (separated knowledge/assessment) and Phase 3 (multi-product platform) evolution; added TODO section to project context; archetype human-editing and Threat Dragon round-trip deferred to experienced professional review |
 | 2026-05-20 (s7) | Identified structural discrepancy between ENISA mapping (based on draft COM(2022) 454) and final CRA text (Reg. EU 2024/2847): Req1+Req2 merged into (1), 3a-3k became (2)(a)-(2)(k), two new clauses (l) and (m) added in final text; produced `CRA_mapping_reconciliation.md` with full clause translation table, 2 missing clauses (❌), 5 partial mappings (⚠️), 7 manual gap items with EN 303 645 interim mappings; file copied to `knowledgebase/` as `CRA_mapping_reconciliation.md` |
 | 2026-05-20 (s8) | Identified EN 18031 (not EN 10381) as mandatory RED standard for consumer wireless IoT from 1 Aug 2025; read STN EN 18031-1/2/3:2024 PDFs; produced `en_18031.md` KB file covering all three parts with clause tables, EN 303 645 mapping, conformity assessment routes, and product applicability matrix; updated `cybersecurity_standards_evaluation_guide.md` with EN 18031 in Consumer IoT section and layered standards table; updated `consumer-thermostat.json` applicable_standards to include EN 18031-1 and -2 |
+| 2026-05-22 (s9) | Clarified dual-standard relationship: EN 303 645 (CRA candidate harmonised standard) and EN 18031 (RED mandatory from Aug 2025) both apply to consumer wireless IoT but under different regulatory instruments; EN 303 645 compliance does not imply EN 18031 compliance; Path A gap table must cover both standards per CRA clause; defined detailed spec for `assess_path_a.py`; added EN 18031 clause IDs to thermostat threat hints as next step; session ended cleanly — ready for new chat |
 
 ---
 
 ## How to resume context with Claude
 
+**Session convention**: use `/plan` before any request that involves modifying files or writing code. Claude will describe the plan and wait for approval before acting.
+
 Paste this document at the start of a new Claude conversation with the following prompt:
 
-> "This is the project context document for a cybersecurity readiness assessment system I am building at UL. Please read it carefully and continue from where we left off. The open questions and next steps are at the bottom."
+> "This is the project context document for a cybersecurity readiness assessment system I am building at UL. Please read it carefully and continue from where we left off. The open questions and next steps are at the bottom. Use /plan before making any changes to files or code."
 
 ---
 
