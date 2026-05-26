@@ -95,14 +95,44 @@ class SessionState(BaseModel):
 
 # ── Archetype loader ──────────────────────────────────────────────────────────
 
+def load_manifest() -> dict:
+    """Load archetypes/manifest.json. Returns empty manifest if file is missing."""
+    manifest_path = ARCHETYPES_DIR / "manifest.json"
+    if manifest_path.exists():
+        try:
+            return json.loads(manifest_path.read_text(encoding="utf-8"))
+        except Exception:
+            pass
+    return {"archetypes": []}
+
 def load_archetype(name: str) -> dict:
+    """
+    Load an archetype by stem name (e.g. 'consumer-thermostat').
+    Also accepts a full archetype ID (e.g. 'consumer-thermostat-001') and resolves
+    it to the correct filename via manifest.json, avoiding fragile string surgery.
+    """
+    # Try direct filename match first
     path = ARCHETYPES_DIR / f"{name}.json"
-    if not path.exists():
-        available = [p.stem for p in ARCHETYPES_DIR.glob("*.json")]
-        console.print(f"[red]Archetype '{name}' not found.[/red]")
-        console.print(f"Available: {', '.join(available)}")
-        sys.exit(1)
-    return json.loads(path.read_text(encoding="utf-8"))
+    if path.exists():
+        return json.loads(path.read_text(encoding="utf-8"))
+
+    # Try resolving via manifest (handles full IDs like 'consumer-thermostat-001')
+    manifest = load_manifest()
+    for entry in manifest.get("archetypes", []):
+        if entry.get("id") == name or entry.get("file", "").replace(".json", "") == name:
+            resolved = ARCHETYPES_DIR / entry["file"]
+            if resolved.exists():
+                return json.loads(resolved.read_text(encoding="utf-8"))
+
+    # Not found — build a helpful error from the manifest if available
+    manifest_names = [e.get("file", "").replace(".json", "") for e in manifest.get("archetypes", [])]
+    available = manifest_names if manifest_names else [p.stem for p in ARCHETYPES_DIR.glob("*.json") if p.stem != "manifest"]
+    console.print(f"[red]Archetype '{name}' not found.[/red]")
+    if available:
+        console.print(f"Available archetypes: {', '.join(available)}")
+    else:
+        console.print(f"No archetypes found in [cyan]{ARCHETYPES_DIR}[/cyan]")
+    sys.exit(1)
 
 
 # ── Session persistence ───────────────────────────────────────────────────────
@@ -537,7 +567,7 @@ def main():
     # Load or init session
     if args.resume:
         session = load_session(args.resume)
-        archetype = load_archetype(session.archetype_id.replace("-001", "").replace("iot-gateway", "iot-gateway"))
+        archetype = load_archetype(session.archetype_id)
         console.print(f"[green]Resuming session {session.instance_id} for {session.product_name}[/green]")
     else:
         if not args.product:

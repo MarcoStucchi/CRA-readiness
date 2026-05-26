@@ -1,0 +1,32 @@
+{
+  "_comment": "Archetype registry manifest. Add an entry here whenever a new archetype JSON is added to archetypes/. elicit.py uses this file to resolve --archetype names and to display the available-archetypes list on error.",
+  "version": "1.0.0",
+  "archetypes": [
+    {
+      "id": "iot-gateway-001",
+      "name": "Industrial IoT gateway",
+      "category": "industrial-IoT",
+      "cra_class": "important-class-I",
+      "file": "iot-gateway.json",
+      "description": "An internet-connected gateway bridging OT field devices (Modbus, BACnet) to a cloud backend. Typical examples: Advantech WISE, Siemens IOT2050, Moxa UC series.",
+      "applicable_standards": [
+        "IEC 62443-4-2",
+        "CRA Annex I"
+      ]
+    },
+    {
+      "id": "consumer-thermostat-001",
+      "name": "Connected consumer thermostat",
+      "category": "consumer-IoT",
+      "cra_class": "default",
+      "file": "consumer-thermostat.json",
+      "description": "A Wi-Fi connected thermostat for residential heating/cooling control, with cloud connectivity, mobile app interface, local display and controls, and OTA firmware updates. Typical examples: Nest, Ecobee, Tado, Honeywell Home T6.",
+      "applicable_standards": [
+        "ETSI EN 303 645 v3.1.3",
+        "EN 18031-1:2024",
+        "EN 18031-2:2024",
+        "CRA Annex I"
+      ]
+    }
+  ]
+}
