@@ -578,7 +578,16 @@
       "en303645_provision": "5.5-1",
       "cra_clause": "Annex I Part I (2)(b)",
       "mitigation": "Mutual TLS with pinned server certificate; validate broker hostname against hardcoded allowlist",
-      "severity": "high"
+      "severity": "high",
+      "en18031_clauses": [
+        "SCM-2",
+        "SCM-3",
+        "AUM-1"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "SCM-2/SCM-3: integrity, authenticity and confidentiality of cloud communications; AUM-1: authentication required on network interfaces accessing security assets"
     },
     {
       "id": "th-002",
@@ -590,7 +599,14 @@
       "en303645_provision": "5.3-10",
       "cra_clause": "Annex I Part I (2)(d)",
       "mitigation": "Per-device or model-specific firmware signing; hardware-rooted verification at boot; anti-rollback via version counter in secure storage",
-      "severity": "high"
+      "severity": "high",
+      "en18031_clauses": [
+        "SUM-2"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "SUM-2: updates must be authenticated and integrity-verified before installation"
     },
     {
       "id": "th-003",
@@ -602,7 +618,14 @@
       "en303645_provision": "5.4-1",
       "cra_clause": "Annex I Part I (2)(c)",
       "mitigation": "Encrypt credential storage with hardware-backed key (TEE, secure element); disable debug interfaces in production",
-      "severity": "high"
+      "severity": "high",
+      "en18031_clauses": [
+        "SSM-3"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "SSM-3: confidential security assets (credentials, keys) in persistent storage must be protected from disclosure"
     },
     {
       "id": "th-004",
@@ -614,7 +637,14 @@
       "en303645_provision": "5.6-4A",
       "cra_clause": "Annex I Part I (2)(h)",
       "mitigation": "Permanently disable JTAG/SWD in production fuses; enable secure boot with hardware root of trust; no exposed debug test pads on external PCB edges",
-      "severity": "high"
+      "severity": "high",
+      "en18031_clauses": [
+        "GEC-5"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "GEC-5: equipment must not expose unnecessary external interfaces; production units must not retain active debug interfaces"
     },
     {
       "id": "th-005",
@@ -626,7 +656,15 @@
       "en303645_provision": "5.6-1",
       "cra_clause": "Annex I Part I (2)(b)",
       "mitigation": "Disable BLE after provisioning; require BLE-level pairing + application-layer auth token for any GATT write; set device to non-discoverable after setup",
-      "severity": "medium"
+      "severity": "medium",
+      "en18031_clauses": [
+        "AUM-1",
+        "GEC-2"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "AUM-1: authentication required on network interfaces (BLE is a network interface); GEC-2: services exposed via network interfaces must be limited to what is necessary"
     },
     {
       "id": "th-006",
@@ -638,7 +676,15 @@
       "en303645_provision": "5.5-5",
       "cra_clause": "Annex I Part I (2)(b)",
       "mitigation": "Require authentication token for all local API calls; limit local API surface to read-only or require confirmation on device display for writes",
-      "severity": "medium"
+      "severity": "medium",
+      "en18031_clauses": [
+        "ACM-2",
+        "AUM-1"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "ACM-2: access control on all network interfaces accessing security assets; AUM-1: authentication required before granting access"
     },
     {
       "id": "th-007",
@@ -650,7 +696,14 @@
       "en303645_provision": "6-1",
       "cra_clause": "Annex I Part I (2)(e)",
       "mitigation": "Explicit disclosure of all sensing capabilities and data recipients; opt-in consent for non-essential data collection; data minimisation — aggregate only, no raw occupancy timestamps to cloud",
-      "severity": "medium"
+      "severity": "medium",
+      "en18031_clauses": [
+        "GEC-7"
+      ],
+      "en18031_parts": [
+        "EN 18031-2"
+      ],
+      "en18031_note": "GEC-7 (EN 18031-2 only): manufacturer must document all external sensing capabilities including occupancy sensors; applies because thermostat processes personal data"
     },
     {
       "id": "th-008",
@@ -662,7 +715,14 @@
       "en303645_provision": "5.9-2",
       "cra_clause": "Annex I Part I (2)(f)",
       "mitigation": "Onboard schedule execution must be independent of cloud connectivity; fail-safe minimum temperature maintained even without network; graceful reconnection with exponential back-off",
-      "severity": "medium"
+      "severity": "medium",
+      "en18031_clauses": [
+        "RLM-1"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "RLM-1: equipment must implement resilience mechanisms to maintain essential functions; no direct EN 303 645 equivalent — this is the primary EN 18031 gap vs EN 303 645"
     },
     {
       "id": "th-009",
@@ -674,7 +734,14 @@
       "en303645_provision": "5.1-1",
       "cra_clause": "Annex I Part I (1)",
       "mitigation": "Unique per-device credentials generated at manufacture; force credential change on first login; no shared default passwords across product class",
-      "severity": "high"
+      "severity": "high",
+      "en18031_clauses": [
+        "AUM-5"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "AUM-5: password-based authenticators must be unique per device or user-changeable; no universal default passwords permitted. NOTE: AUM-5 clauses 6.2.5.1 and 6.2.5.2 are RESTRICTED — if the manufacturer permits users not to set a password, a notified body must be consulted (OJ L 2025/138)"
     },
     {
       "id": "th-010",
@@ -686,7 +753,14 @@
       "en303645_provision": "5.11-1",
       "cra_clause": "Annex I Part I (2)(m)",
       "mitigation": "Factory reset must cryptographically erase or overwrite all user data partitions, including credentials, schedules and logs; accessible from local UI without cloud connectivity",
-      "severity": "medium"
+      "severity": "medium",
+      "en18031_clauses": [
+        "DLM-1"
+      ],
+      "en18031_parts": [
+        "EN 18031-2"
+      ],
+      "en18031_note": "DLM-1 (EN 18031-2 only): equipment must implement mechanisms to delete personal data when required; applies because thermostat processes occupancy, schedule and user account data"
     },
     {
       "id": "th-011",
@@ -698,7 +772,14 @@
       "en303645_provision": "5.13-1B",
       "cra_clause": "Annex I Part I (2)(d)",
       "mitigation": "Device-side validation of commanded setpoints within safe physical bounds; rate-limiting of remote setpoint changes; local override always available without network",
-      "severity": "high"
+      "severity": "high",
+      "en18031_clauses": [
+        "GEC-6"
+      ],
+      "en18031_parts": [
+        "EN 18031-1"
+      ],
+      "en18031_note": "GEC-6: equipment must validate inputs received via network and user interfaces; covers malicious setpoint values pushed via cloud or local API"
     },
     {
       "id": "th-012",
@@ -710,7 +791,10 @@
       "en303645_provision": "5.2-1",
       "cra_clause": "Annex I Part II (5)",
       "mitigation": "Publish CVD policy at a stable URL (e.g. security.txt, manufacturer website); include contact email, acknowledgement timelines, and status update commitments",
-      "severity": "medium"
+      "severity": "medium",
+      "en18031_clauses": [],
+      "en18031_parts": [],
+      "en18031_note": "No EN 18031 clause covers coordinated vulnerability disclosure policy. CVD is a procedural CRA Annex I Part II (5) obligation only — no technical standard addresses it."
     }
   ]
 }
